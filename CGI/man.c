@@ -142,6 +142,7 @@ char* kn_manpage_process(const char* path) {
 									b = kn_strcat(b, "<u>");
 									free(tmp);
 								}
+								m = 'U';
 								tmp = b;
 								b = kn_strcat(b, HTML(cbuf));
 								free(tmp);
