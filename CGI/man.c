@@ -63,6 +63,8 @@ bool kn_has_manpage(const char* str) {
 	return true;
 }
 
+#define HTML(buf) (buf[0] == '<' ? "&lt;" : (buf[0] == '>' ? "&gt;" : (buf[0] == '&' ? "&amp;" : buf)))
+
 char* kn_manpage_process(const char* path) {
 	char* b = malloc(1);
 	b[0] = 0;
@@ -107,7 +109,7 @@ char* kn_manpage_process(const char* path) {
 							m = 0;
 							cbuf[0] = s;
 							tmp = b;
-							b = kn_strcat(b, cbuf);
+							b = kn_strcat(b, HTML(cbuf));
 							free(tmp);
 						} else {
 							if(old == s) {
@@ -125,7 +127,7 @@ char* kn_manpage_process(const char* path) {
 								}
 								m = 'B';
 								tmp = b;
-								b = kn_strcat(b, cbuf);
+								b = kn_strcat(b, HTML(cbuf));
 								free(tmp);
 							} else if(old == '_') {
 								cbuf[0] = s;
@@ -141,7 +143,7 @@ char* kn_manpage_process(const char* path) {
 									free(tmp);
 								}
 								tmp = b;
-								b = kn_strcat(b, cbuf);
+								b = kn_strcat(b, HTML(cbuf));
 								free(tmp);
 								tmp = b;
 								b = kn_strcat(b, "</u>");
