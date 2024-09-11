@@ -146,9 +146,6 @@ char* kn_manpage_process(const char* path) {
 								tmp = b;
 								b = kn_strcat(b, HTML(cbuf));
 								free(tmp);
-								tmp = b;
-								b = kn_strcat(b, "</u>");
-								free(tmp);
 							}
 							old = 0;
 						}
