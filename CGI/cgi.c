@@ -50,7 +50,7 @@ void manpage_scan(const char* root) {
 					manpage_scan(path);
 				} else {
 					char* name = kn_strdup(nl[i]->d_name);
-					char* desc = kn_strdup("dadsandasndasdsadmadsadmsmdsmdmdksmdkamdkmdksmdsmdmskdmdmsakdsdmsakdmskdmsdmsadkmsakdmdsdmsdkamdkmdkamdksmdksamkdsmdkmadmsakdmsakdmmdakmdsm");
+					char* desc = kn_strdup("&lt;No description detected&gt;");
 
 					int incr = 0;
 					FILE* f = fopen(path, "r");
@@ -60,24 +60,24 @@ void manpage_scan(const char* root) {
 					fclose(f);
 
 					int j;
-					for(j = 0;; j++){
-						if(b[j] == '\n' || b[j] == 0){
+					for(j = 0;; j++) {
+						if(b[j] == '\n' || b[j] == 0) {
 							char* line = malloc(j - incr + 1);
 							line[j - incr] = 0;
 							memcpy(line, b + incr, j - incr);
 
 							int k;
-							for(k = 0; line[k] != 0 && k < 4; k++){
-								if(line[k] == ' '){
+							for(k = 0; line[k] != 0 && k < 4; k++) {
+								if(line[k] == ' ') {
 									line[k] = 0;
-									if(strcasecmp(line, ".Nd") == 0){
+									if(strcasecmp(line, ".Nd") == 0) {
 										free(desc);
 										desc = kn_strdup(line + k + 1);
 										int l;
-										for(l = 0; desc[l] != 0; l++){
-											if(desc[l] == '\\'){
+										for(l = 0; desc[l] != 0; l++) {
+											if(desc[l] == '\\') {
 												l++;
-												if(desc[l] == '"'){
+												if(desc[l] == '"') {
 													l--;
 													desc[l] = 0;
 													break;
@@ -97,7 +97,7 @@ void manpage_scan(const char* root) {
 
 					free(b);
 
-					if(strlen(desc) > 70){
+					if(strlen(desc) > 70) {
 						desc[70] = 0;
 						desc[69] = '.';
 						desc[68] = '.';
@@ -124,7 +124,7 @@ void list_manpages(void) {
 #ifdef MANPAGE_DIRS
 	int i;
 	const char* dirs[] = MANPAGE_DIRS;
-	for(i = 0; i < sizeof(dirs) / sizeof(*dirs); i++){
+	for(i = 0; i < sizeof(dirs) / sizeof(*dirs); i++) {
 		manpage_scan(dirs[i]);
 	}
 #else
@@ -185,7 +185,7 @@ void kn_parse_query(void) {
 #ifdef MANPAGE_DIRS
 		int i;
 		const char* dirs[] = MANPAGE_DIRS;
-		for(i = 0; i < sizeof(dirs) / sizeof(*dirs); i++){
+		for(i = 0; i < sizeof(dirs) / sizeof(*dirs); i++) {
 			cond = (path = kn_find(dirs[i], kn_get_query("page"))) != NULL;
 			if(cond) break;
 		}
