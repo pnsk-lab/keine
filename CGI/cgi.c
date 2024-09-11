@@ -214,7 +214,8 @@ void kn_cgi(void) {
 		printf("%s", kn_get_query("page"));
 	}
 	printf("</title>\n");
-	printf("		<style>\n");;
+	printf("		<style>\n");
+	;
 	printf("html {\n");
 	printf("	background-color: #222222;\n");
 	printf("	color: #ffffff;\n");
