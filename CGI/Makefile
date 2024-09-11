@@ -2,7 +2,7 @@
 
 include $(PWD)/Platform/$(PLATFORM).mk
 
-OBJS = main.o cgi.o util.o version.o
+OBJS = main.o cgi.o util.o version.o man.o
 
 .PHONY: all clean
 .SUFFIXES: .c .o

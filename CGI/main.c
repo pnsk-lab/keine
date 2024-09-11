@@ -4,7 +4,7 @@
 
 #include "kn_cgi.h"
 
-int main(){
+int main() {
 	printf("Content-Type: text/html\n");
 	kn_parse_query();
 	kn_cgi();
