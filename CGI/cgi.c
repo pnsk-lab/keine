@@ -50,7 +50,7 @@ void manpage_scan(const char* root) {
 					manpage_scan(path);
 				} else {
 					char* name = kn_strdup(nl[i]->d_name);
-					char* desc = kn_strdup("&lt;No description detected&gt;");
+					char* desc = kn_strdup("<span class=\"reverse\"> &lt;No description detected&gt; </span>");
 
 					int incr = 0;
 					FILE* f = fopen(path, "r");
@@ -214,10 +214,17 @@ void kn_cgi(void) {
 		printf("%s", kn_get_query("page"));
 	}
 	printf("</title>\n");
-	printf("		<style>\n");
+	printf("		<style>\n");;
 	printf("html {\n");
 	printf("	background-color: #222222;\n");
 	printf("	color: #ffffff;\n");
+	printf("}\n");
+	printf("html, input, code {\n");
+	printf("	font-size: 15px;\n");
+	printf("}\n");
+	printf(".reverse {\n");
+	printf("	color: #222222;\n");
+	printf("	background-color: #ffffff;\n");
 	printf("}\n");
 	printf("body {\n");
 	printf("	width: 900px;\n");
