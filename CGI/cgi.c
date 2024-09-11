@@ -4,9 +4,11 @@
 
 #include "kn_cgi.h"
 
+#include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 #include <stdio.h>
 
 #include "kn_version.h"
@@ -33,6 +35,102 @@ char* kn_get_query(const char* key) {
 }
 
 char* kn_null(const char* a) { return a == NULL ? "" : (char*)a; }
+
+void manpage_scan(const char* root) {
+	struct dirent** nl;
+	int n = scandir(root, &nl, NULL, alphasort);
+	if(n < 0) return;
+	int i;
+	for(i = 0; i < n; i++) {
+		if(strcmp(nl[i]->d_name, ".") != 0 && strcmp(nl[i]->d_name, "..") != 0) {
+			char* path = kn_strcat3(root, "/", nl[i]->d_name);
+			struct stat s;
+			if(stat(path, &s) == 0) {
+				if(S_ISDIR(s.st_mode)) {
+					manpage_scan(path);
+				} else {
+					char* name = kn_strdup(nl[i]->d_name);
+					char* desc = kn_strdup("dadsandasndasdsadmadsadmsmdsmdmdksmdkamdkmdksmdsmdmskdmdmsakdsdmsakdmskdmsdmsadkmsakdmdsdmsdkamdkmdkamdksmdksamkdsmdkmadmsakdmsakdmmdakmdsm");
+
+					int incr = 0;
+					FILE* f = fopen(path, "r");
+					char* b = malloc(s.st_size + 1);
+					b[s.st_size] = 0;
+					fread(b, s.st_size, 1, f);
+					fclose(f);
+
+					int j;
+					for(j = 0;; j++){
+						if(b[j] == '\n' || b[j] == 0){
+							char* line = malloc(j - incr + 1);
+							line[j - incr] = 0;
+							memcpy(line, b + incr, j - incr);
+
+							int k;
+							for(k = 0; line[k] != 0 && k < 4; k++){
+								if(line[k] == ' '){
+									line[k] = 0;
+									if(strcasecmp(line, ".Nd") == 0){
+										free(desc);
+										desc = kn_strdup(line + k + 1);
+										int l;
+										for(l = 0; desc[l] != 0; l++){
+											if(desc[l] == '\\'){
+												l++;
+												if(desc[l] == '"'){
+													l--;
+													desc[l] = 0;
+													break;
+												}
+											}
+										}
+									}
+									break;
+								}
+							}
+
+							free(line);
+							incr = j + 1;
+							if(b[j] == 0) break;
+						}
+					}
+
+					free(b);
+
+					if(strlen(desc) > 70){
+						desc[70] = 0;
+						desc[69] = '.';
+						desc[68] = '.';
+						desc[67] = '.';
+					}
+
+					printf("<tr>\n");
+					printf("	<td><a href=\"?page=%s\">%s</a></td>\n", name, name);
+					printf("	<td><code>%s</code></td>\n", desc);
+					printf("</tr>\n");
+
+					free(name);
+					free(desc);
+				}
+			}
+			free(path);
+		}
+		free(nl[i]);
+	}
+	free(nl);
+}
+
+void list_manpages(void) {
+#ifdef MANPAGE_DIRS
+	int i;
+	const char* dirs[] = MANPAGE_DIRS;
+	for(i = 0; i < sizeof(dirs) / sizeof(*dirs); i++){
+		manpage_scan(dirs[i]);
+	}
+#else
+	manpage_scan(MANPAGE_DIR);
+#endif
+}
 
 void kn_parse_query(void) {
 	char* query = getenv("QUERY_STRING");
@@ -83,7 +181,18 @@ void kn_parse_query(void) {
 		printf("Status: 200 OK\n\n");
 		showmain = true;
 	} else {
-		if((path = kn_find(MANPAGE_DIR, kn_get_query("page"))) != NULL) {
+		bool cond = false;
+#ifdef MANPAGE_DIRS
+		int i;
+		const char* dirs[] = MANPAGE_DIRS;
+		for(i = 0; i < sizeof(dirs) / sizeof(*dirs); i++){
+			cond = (path = kn_find(dirs[i], kn_get_query("page"))) != NULL;
+			if(cond) break;
+		}
+#else
+		cond = (path = kn_find(MANPAGE_DIR, kn_get_query("page"))) != NULL;
+#endif
+		if(cond) {
 			printf("Status: 200 OK\n\n");
 		} else {
 			printf("Status: 404 Not Found\n\n");
@@ -126,7 +235,7 @@ void kn_cgi(void) {
 	printf("		<div style=\"text-align: center;\">\n");
 	printf("			<form action=\"%s%s\">\n", getenv("SCRIPT_NAME"), kn_null(getenv("PATH_INFO")));
 	printf("				<a href=\"%s%s\">Main</a> | ", getenv("SCRIPT_NAME"), kn_null(getenv("PATH_INFO")));
-	printf("				Name: <input name=\"page\">\n");
+	printf("				Name: <input name=\"page\"%s%s%s>\n", kn_get_query("page") == NULL ? "" : " value=\"", kn_get_query("page") == NULL ? "" : kn_get_query("page"), kn_get_query("page") == NULL ? "" : "\"");
 	printf("				<input type=\"submit\">\n");
 	printf("			</form>\n");
 	printf("		</div>\n");
@@ -134,7 +243,18 @@ void kn_cgi(void) {
 	if(no) {
 		printf("		Not found.\n");
 	} else if(showmain) {
+#ifdef MAIN_HTML
 		printf("%s", MAIN_HTML);
+#else
+		printf("<h1>Index</h1>\n");
+		printf("<table border=\"0\" style=\"width: 900px;\">\n");
+		printf("	<tr>\n");
+		printf("		<th style=\"width: 50px;\">Name</th>\n");
+		printf("		<th>Description</th>\n");
+		printf("	</tr>\n");
+		list_manpages();
+		printf("</table>\n");
+#endif
 	} else {
 		printf("<pre>");
 		char* c = kn_manpage_process(path);

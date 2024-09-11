@@ -44,9 +44,22 @@ char* kn_find(const char* root, const char* name) {
 }
 
 bool kn_has_manpage(const char* str) {
+#ifdef MANPAGE_DIRS
+	int i;
+	const char* dirs[] = MANPAGE_DIRS;
+	for(i = 0; i < sizeof(dirs) / sizeof(*dirs); i++){
+		char* pth = kn_find(dirs[i], str);
+		if(pth != NULL){
+			free(pth);
+			return true;
+		}
+	}
+	return false;
+#else
 	char* pth = kn_find(MANPAGE_DIR, str);
 	if(pth == NULL) return false;
 	free(pth);
+#endif
 	return true;
 }
 

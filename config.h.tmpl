@@ -3,13 +3,18 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-/* HTML which gets shown on the main. */
+/* HTML which gets shown on the main, undef it for the index */
 #define MAIN_HTML "<h1>Index</h1>"
 
 /* Manual page root */
 #define MANPAGE_DIR "/usr/share/man"
 
-/* Footer, comment it for no footer */
+/* Define this for multiple directories */
+/*
+#define MANPAGE_DIRS {"/usr/share/man/man1", "/usr/share/man/man2", "/usr/share/man/man3", "/usr/share/man/man3f", "/usr/share/man/man3lua", "/usr/share/man/man4", "/usr/share/man/man5", "/usr/share/man/man6", "/usr/share/man/man7", "/usr/share/man/man8", "/usr/share/man/man9", "/usr/share/man/man9lua"}
+*/
+
+/* Footer, undef it for no footer */
 #define FOOTER_HTML "some footer"
 
 #endif
