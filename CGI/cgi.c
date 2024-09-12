@@ -223,6 +223,9 @@ void kn_cgi(void) {
 	printf("html, input, code {\n");
 	printf("	font-size: 15px;\n");
 	printf("}\n");
+	printf("pre {\n");
+	printf("	font-size: 15px;\n");
+	printf("}\n");
 	printf(".reverse {\n");
 	printf("	color: #222222;\n");
 	printf("	background-color: #ffffff;\n");
