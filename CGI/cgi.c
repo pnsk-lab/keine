@@ -27,8 +27,7 @@ char* path;
 
 char* kn_get_query(const char* key) {
 	if(entries == NULL) return NULL;
-	int i;
-	for(i = 0; entries[i] != NULL; i++) {
+	for(int i = 0; entries[i] != NULL; i++) {
 		if(strcmp(entries[i]->key, key) == 0) return entries[i]->value;
 	}
 	return NULL;
